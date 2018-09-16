@@ -106,6 +106,7 @@ public class MobileSignalController extends SignalController<
 
     // 4G instead of LTE
     private int mShow4GUserConfig;
+    private boolean mDataDisabledIcon;
 
     // Volte Icon
     private boolean mVoLTEicon;
@@ -194,6 +195,9 @@ public class MobileSignalController extends SignalController<
            resolver.registerContentObserver(Settings.System.getUriFor(
                   Settings.System.VOLTE_ICON_STYLE),
                   false,this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.DATA_DISABLED_ICON), false,
+                    this, UserHandle.USER_ALL);
            updateSettings();
         }
 
@@ -202,7 +206,7 @@ public class MobileSignalController extends SignalController<
          */
         @Override
         public void onChange(boolean selfChange, Uri uri) {
-            updateSettings();
+             updateSettings();
         }
     }
 
@@ -217,6 +221,9 @@ public class MobileSignalController extends SignalController<
         mVoLTEstyle = Settings.System.getIntForUser(resolver,
                 Settings.System.VOLTE_ICON_STYLE, 0,
                 UserHandle.USER_CURRENT);
+        mDataDisabledIcon = Settings.System.getIntForUser(resolver,
+                Settings.System.DATA_DISABLED_ICON, 1,
+                UserHandle.USER_CURRENT) == 1;
 
         mapIconSets();
         updateTelephony();
@@ -761,7 +768,7 @@ public class MobileSignalController extends SignalController<
         mCurrentState.roaming = isRoaming();
         if (isCarrierNetworkChangeActive()) {
             mCurrentState.iconGroup = TelephonyIcons.CARRIER_NETWORK_CHANGE;
-        } else if (isDataDisabled() && !mConfig.alwaysShowDataRatIcon) {
+        } else if (isDataDisabled() && mDataDisabledIcon/*!mConfig.alwaysShowDataRatIcon*/) {
             if (mSubscriptionInfo.getSubscriptionId() != mDefaults.getDefaultDataSubId()) {
                 mCurrentState.iconGroup = TelephonyIcons.NOT_DEFAULT_DATA;
             } else {
