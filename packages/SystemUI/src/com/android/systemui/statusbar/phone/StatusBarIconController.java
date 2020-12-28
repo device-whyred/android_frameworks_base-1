@@ -450,17 +450,18 @@ public interface StatusBarIconController {
             return new DemoStatusIcons((LinearLayout) mGroup, mIconSize);
         }
 
+        private boolean useOldStyleMobileDataIcons() {
+            return Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.USE_OLD_MOBILETYPE, 0,
+                    UserHandle.USER_CURRENT) != 0;
+        }
+
         public void setKeyguardShowing(boolean showing) {
             for (int i = 0; i < mGroup.getChildCount(); i++) {
                 if (mGroup.getChildAt(i) instanceof NetworkTrafficSB) {
                     ((NetworkTrafficSB)mGroup.getChildAt(i)).setKeyguardShowing(showing);
                 }
             }
-
-        private boolean useOldStyleMobileDataIcons() {
-            return Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.USE_OLD_MOBILETYPE, 0,
-                    UserHandle.USER_CURRENT) != 0;
         }
     }
 }
